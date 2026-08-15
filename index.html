@@ -3,153 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VALØR — Official Community</title>
+<title>VALØR — Futuristic Cursor Demo</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#070707;color:#eee;font-family:Arial,sans-serif}
-body:before{content:"VALØR";position:fixed;inset:0;display:grid;place-items:center;font-size:22vw;font-weight:900;color:#fff;opacity:.018;pointer-events:none}
-nav{position:sticky;top:0;z-index:5;background:#080808dd;backdrop-filter:blur(14px);border-bottom:1px solid #252525;padding:16px 6%;display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:24px;font-weight:900;letter-spacing:3px}.links a{color:#aaa;text-decoration:none;margin:0 10px;font-size:14px}.links a:hover{color:#fff}
-.hero{text-align:center;padding:100px 20px 70px;background:radial-gradient(circle at 50% 20%,#242424,#070707 55%)}
-.hero h1{font-size:clamp(55px,11vw,120px);margin:0;letter-spacing:12px}.hero p{color:#999;font-size:18px}
-.btn{display:inline-block;background:#eee;color:#080808;padding:14px 24px;border-radius:10px;text-decoration:none;font-weight:800;margin:10px}
-.btn.alt{background:#151515;color:#eee;border:1px solid #333}
-section{max-width:1100px;margin:auto;padding:55px 20px}h2{font-size:32px;margin-bottom:24px}.muted{color:#888}
-.stats,.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}.card,.stat{background:#101010;border:1px solid #292929;border-radius:16px;padding:22px}.stat strong{display:block;font-size:30px}.stat span{color:#888}
-.team{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.person{background:#101010;border:1px solid #292929;border-radius:16px;padding:20px}.avatar{width:55px;height:55px;border-radius:50%;background:linear-gradient(135deg,#ddd,#222);display:grid;place-items:center;color:#111;font-weight:900;margin-bottom:12px}.role{color:#aaa;font-size:13px}
-.tag{display:inline-block;border:1px solid #444;border-radius:20px;padding:5px 9px;font-size:11px;margin-top:10px}
-input{width:100%;padding:14px;background:#0d0d0d;color:#fff;border:1px solid #333;border-radius:10px;margin-bottom:18px}
-footer{text-align:center;border-top:1px solid #222;padding:30px;color:#666}
-@media(max-width:700px){.links{display:none}.hero{padding-top:70px}.hero h1{letter-spacing:6px}}
-
-/* VALØR premium animations */
-html{scroll-behavior:smooth}
-body{overflow-x:hidden}
-.hero h1{animation:valorReveal 1.2s ease-out both}
-.hero p{animation:fadeUp .9s .25s ease-out both}
-.hero .btn{animation:fadeUp .8s .45s ease-out both}
-.stat,.person,.card{animation:cardReveal .7s ease-out both;transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease}
-.stat:hover,.person:hover,.card:hover{transform:translateY(-7px);box-shadow:0 14px 40px #000;border-color:#555}
-.avatar{transition:transform .35s ease,filter .35s ease}
-.person:hover .avatar{transform:scale(1.08) rotate(4deg);filter:brightness(1.2)}
-.btn{transition:transform .25s ease,box-shadow .25s ease}
-.btn:hover{transform:translateY(-3px);box-shadow:0 10px 28px #000}
-nav{animation:navDrop .7s ease-out both}
-body:after{content:"";position:fixed;top:-20%;left:-10%;width:45vw;height:45vw;border-radius:50%;background:#fff;opacity:.025;filter:blur(80px);pointer-events:none;animation:orbMove 12s ease-in-out infinite alternate}
-@keyframes valorReveal{from{opacity:0;transform:translateY(30px) scale(.96);letter-spacing:25px}to{opacity:1;transform:none;letter-spacing:12px}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-@keyframes cardReveal{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-@keyframes navDrop{from{opacity:0;transform:translateY(-15px)}to{opacity:1;transform:none}}
-@keyframes orbMove{from{transform:translate(0,0)}to{transform:translate(55vw,45vh)}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#060606;color:#eee;font-family:Arial,sans-serif;display:grid;place-items:center;text-align:center;overflow:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at 50% 40%,#222,#060606 60%)}
+h1{font-size:clamp(50px,10vw,110px);letter-spacing:12px;margin:0}.muted{color:#888}
+.valor-cursor-glow,.valor-cursor-dot,.valor-cursor-ring,.valor-cursor-ring2{position:fixed;left:0;top:0;pointer-events:none;z-index:10000;transform:translate(-50%,-50%)}
+.valor-cursor-glow{width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.12),rgba(255,255,255,.035) 40%,transparent 72%);filter:blur(7px);transition:.2s}
+.valor-cursor-dot{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 12px #fff,0 0 25px rgba(255,255,255,.65)}
+.valor-cursor-ring{width:62px;height:62px;border:1px solid rgba(255,255,255,.65);border-radius:50%;animation:spin 5s linear infinite}
+.valor-cursor-ring2{width:110px;height:110px;border:1px solid rgba(255,255,255,.2);border-radius:50%;animation:spin2 9s linear infinite}
+.valor-cursor-ring:before,.valor-cursor-ring:after{content:"";position:absolute;width:5px;height:5px;border:1px solid #fff;transform:rotate(45deg)}
+.valor-cursor-ring:before{left:-3px;top:50%}.valor-cursor-ring:after{right:-3px;top:50%}
+.valor-cursor-particle{position:fixed;width:3px;height:3px;border-radius:50%;background:#fff;pointer-events:none;z-index:9999;box-shadow:0 0 8px #fff;animation:particle .7s ease-out forwards}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}@keyframes spin2{to{transform:translate(-50%,-50%) rotate(-360deg)}}
+@keyframes particle{to{opacity:0;transform:translate(var(--px),var(--py)) scale(.15)}}
+@media(max-width:700px),(pointer:coarse){.valor-cursor-glow,.valor-cursor-dot,.valor-cursor-ring,.valor-cursor-ring2,.valor-cursor-particle{display:none}}
 </style>
 </head>
 <body>
-<div class="bg-animation" aria-hidden="true">
-  <div class="bg-grid"></div>
-  <div class="bg-orb orb-a"></div>
-  <div class="bg-orb orb-b"></div>
-  <div class="bg-orb orb-c"></div>
-  <div class="bg-stars"></div>
-</div>
-<style>
-.bg-animation{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:#070707}
-.bg-grid{position:absolute;inset:-50%;opacity:.13;
-  background-image:linear-gradient(#aaa 1px,transparent 1px),linear-gradient(90deg,#aaa 1px,transparent 1px);
-  background-size:70px 70px;
-  transform:perspective(500px) rotateX(62deg) translateY(-8%);
-  animation:gridMove 18s linear infinite}
-.bg-orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.12}
-.orb-a{width:380px;height:380px;left:-120px;top:15%;background:#fff;animation:floatA 13s ease-in-out infinite alternate}
-.orb-b{width:300px;height:300px;right:-80px;top:50%;background:#aaa;animation:floatB 16s ease-in-out infinite alternate}
-.orb-c{width:240px;height:240px;left:45%;bottom:-100px;background:#fff;animation:floatC 11s ease-in-out infinite alternate}
-.bg-stars{
-  position:absolute;inset:0;opacity:.35;
-  background-image:radial-gradient(circle,#fff 1px,transparent 1.5px);
-  background-size:95px 95px;
-  animation:starsMove 25s linear infinite;
-}
-@keyframes gridMove{from{transform:perspective(500px) rotateX(62deg) translateY(-8%)}to{transform:perspective(500px) rotateX(62deg) translateY(8%)}}
-@keyframes floatA{from{transform:translate(0,0)}to{transform:translate(240px,100px)}}
-@keyframes floatB{from{transform:translate(0,0)}to{transform:translate(-180px,-120px)}}
-@keyframes floatC{from{transform:translate(-100px,0)}to{transform:translate(120px,-160px)}}
-@keyframes starsMove{from{transform:translate(0,0)}to{transform:translate(95px,95px)}}
-@media(prefers-reduced-motion:reduce){
-  .bg-grid,.bg-orb,.bg-stars{animation:none!important}
-}
-</style>
-<div id="loader"><div class="loader-logo">VALØR</div></div>
-<style>
-#loader{position:fixed;inset:0;z-index:9999;background:#070707;display:grid;place-items:center;animation:loaderOut .9s 1.15s ease forwards;pointer-events:none}
-.loader-logo{font-size:clamp(40px,8vw,90px);font-weight:900;letter-spacing:12px;animation:loaderPulse 1s ease-in-out infinite alternate}
-@keyframes loaderPulse{from{opacity:.35;transform:scale(.97)}to{opacity:1;transform:scale(1.02)}}
-@keyframes loaderOut{to{opacity:0;visibility:hidden}}
-</style>
-
-<nav><div class="logo">VALØR</div><div class="links"><a href="#team">Team</a><a href="#members">Members</a><a href="#projects">Projects</a><a href="#news">News</a><a href="#rules">Rules</a><a href="#faq">FAQ</a></div></nav>
-
-<header class="hero">
-<h1>VALØR</h1><p>Official VALØR Community</p>
-<a class="btn" href="https://discord.gg/Mzefa4emA">JOIN DISCORD</a><a class="btn alt" href="#team">MEET THE TEAM</a>
-</header>
-
-<section><h2>Community Dashboard</h2><div class="stats">
-<div class="stat"><strong>215</strong><span>Members</span></div>
-<div class="stat"><strong>10</strong><span>Developers</span></div>
-<div class="stat"><strong>1</strong><span>Community</span></div>
-<div class="stat"><strong>🟢</strong><span>Discord</span></div>
-</div></section>
-
-<section id="team"><h2>Team</h2><p class="muted">The people behind VALØR.</p><div class="team">
-<div class="person"><div class="avatar">V</div><b>00Vyane</b><div class="role">Website Founder</div></div>
-<div class="person"><div class="avatar">V</div><b>VΛLØR</b><div class="role">Owner</div></div>
-<div class="person"><div class="avatar">G</div><b>VALØR | GerrardSUSNPC</b><div class="role">Co-Owner</div></div>
-<div class="person"><div class="avatar">D</div><b>VΛLØR_[Бан]Даниил</b><div class="role">Co-Owner</div></div>
-</div>
-
-<h2 style="margin-top:42px">Developers</h2>
-<p class="muted">Developer names shown from the member list you provided.</p>
-<div class="team">
-<div class="person"><div class="avatar">η</div><b>×× ηɇQɇη</b><div class="role">Developer</div></div>
-<div class="person"><div class="avatar">B</div><b>BLEED</b><div class="role">Developer</div></div>
-<div class="person"><div class="avatar">T</div><b>TURTLE</b><div class="role">Developer</div></div>
-<div class="person"><div class="avatar">S</div><b>Specter</b><div class="role">Developer</div></div>
-<div class="person"><div class="avatar">V</div><b>VALOR_ME</b><div class="role">Developer</div></div>
-<div class="person"><div class="avatar">V</div><b>VΛLØR | Vxz</b><div class="role">Developer</div></div>
-</div></section>
-
-<section id="members"><h2>Members</h2><input id="search" placeholder="Search members by display name..."><p class="muted">215 members are part of the VALØR community. Live member search can be connected to Discord later.</p></section>
-
-<section id="projects"><h2>Projects</h2><div class="cards">
-<div class="card"><h3>VALØR Website</h3><p class="muted">Official community website.</p><span class="tag">LIVE</span></div>
-<div class="card"><h3>VALØR Roblox</h3><p class="muted">Roblox projects associated with VALØR.</p><span class="tag">IN DEVELOPMENT</span></div>
-<div class="card"><h3>Future Projects</h3><p class="muted">More VALØR projects coming soon.</p><span class="tag">COMING SOON</span></div>
-</div></section>
-
-<section id="news"><h2>Announcements</h2><div class="card"><h3>Welcome to VALØR</h3><p class="muted">The official VALØR website is being built with a premium community dashboard, team system and project showcase.</p></div></section>
-
-<section><h2>Gallery</h2><div class="cards"><div class="card"><h3>VALØR</h3><p class="muted">Branding and community media can be added here.</p></div><div class="card"><h3>Projects</h3><p class="muted">Screenshots and artwork can be showcased here.</p></div></div></section>
-
-
-<section id="rules">
-<h2>Rules</h2>
-<p class="muted">Keep VALØR welcoming, respectful, and enjoyable for everyone.</p>
-<div class="cards">
-<div class="card"><h3>01 · Respect</h3><p class="muted">Treat members and staff with respect. No harassment, bullying, or targeted abuse.</p></div>
-<div class="card"><h3>02 · No Spam</h3><p class="muted">Avoid spam, excessive messages, disruptive behavior, or unwanted mentions.</p></div>
-<div class="card"><h3>03 · No Illegal Content</h3><p class="muted">Do not share illegal, malicious, or dangerous content through VALØR.</p></div>
-<div class="card"><h3>04 · Keep It Appropriate</h3><p class="muted">Keep conversations and shared content suitable for the community.</p></div>
-<div class="card"><h3>05 · No Exploiting</h3><p class="muted">Do not abuse bugs, exploits, or systems in VALØR projects.</p></div>
-<div class="card"><h3>06 · Staff Decisions</h3><p class="muted">Follow reasonable staff instructions. Appeals can be handled through the appropriate VALØR channel.</p></div>
-<div class="card"><h3>07 · Protect Privacy</h3><p class="muted">Never share another person's private information without permission.</p></div>
-<div class="card"><h3>08 · Use Common Sense</h3><p class="muted">If something could seriously harm the community or its members, don't do it.</p></div>
-</div>
-</section>
-
-<section id="faq"><h2>FAQ</h2><div class="cards">
-<div class="card"><h3>What is VALØR?</h3><p class="muted">A community and project group.</p></div>
-<div class="card"><h3>How do I join?</h3><p class="muted">Use the Discord button above.</p></div>
-<div class="card"><h3>How many members?</h3><p class="muted">The current displayed count is 215.</p></div>
-</div></section>
-
-<footer>© 2026 VALØR · Official Community</footer>
+<div class="bg"></div><main><h1>VALØR</h1><p class="muted">Move your cursor around the page.</p></main>
+<div class="valor-cursor-glow"></div><div class="valor-cursor-ring2"></div><div class="valor-cursor-ring"></div><div class="valor-cursor-dot"></div>
+<script>
+(()=>{const g=document.querySelector('.valor-cursor-glow'),r=document.querySelector('.valor-cursor-ring'),r2=document.querySelector('.valor-cursor-ring2'),d=document.querySelector('.valor-cursor-dot');let x=-200,y=-200,gx=x,gy=y,rx=x,ry=y;
+document.addEventListener('mousemove',e=>{x=e.clientX;y=e.clientY;d.style.left=x+'px';d.style.top=y+'px';for(let i=0;i<2;i++){const p=document.createElement('i');p.className='valor-cursor-particle';p.style.left=x+'px';p.style.top=y+'px';p.style.setProperty('--px',((Math.random()-.5)*55)+'px');p.style.setProperty('--py',((Math.random()-.5)*55)+'px');document.body.appendChild(p);setTimeout(()=>p.remove(),700)}});
+function loop(){gx+=(x-gx)*.08;gy+=(y-gy)*.08;rx+=(x-rx)*.16;ry+=(y-ry)*.16;g.style.left=gx+'px';g.style.top=gy+'px';r.style.left=rx+'px';r.style.top=ry+'px';r2.style.left=rx+'px';r2.style.top=ry+'px';requestAnimationFrame(loop)}loop()})();
+</script>
 </body></html>
