@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VALØR // Command Network</title>
+<style>
+:root{--bg:#050308;--panel:#0d0813;--purple:#9b4dff;--violet:#c46cff;--text:#f4ecff;--muted:#9b8da8;--line:#2a1738}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#1b0b2b 0,#050308 42%);color:var(--text);font:15px Segoe UI,Arial,sans-serif;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(155,77,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(155,77,255,.035) 1px,transparent 1px);background-size:42px 42px}
+header{position:sticky;top:0;z-index:5;background:#050308ed;border-bottom:1px solid var(--line);backdrop-filter:blur(12px);padding:14px 4vw;display:flex;gap:18px;align-items:center}.logo{font-weight:900;letter-spacing:.2em;font-size:20px;text-shadow:0 0 22px var(--purple)}nav{display:flex;gap:4px;overflow:auto}nav button,.btn{background:#12091b;border:1px solid #3b2050;color:#eee;padding:9px 12px;cursor:pointer}nav button:hover,.btn:hover{border-color:var(--purple);box-shadow:0 0 15px #9b4d5533}
+main{width:min(1100px,92vw);margin:auto;padding:45px 0 70px}.eyebrow{color:var(--violet);letter-spacing:.28em;font-size:12px}.hero{min-height:55vh;display:flex;flex-direction:column;justify-content:center}h1{font-size:clamp(2.6rem,7vw,6rem);margin:8px 0;text-shadow:0 0 30px #9b4d6666}h2{margin-top:0}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.card{background:#0d0813e8;border:1px solid var(--line);padding:18px;border-radius:8px;box-shadow:0 0 30px #0005}.value{font-size:1.6rem;font-weight:800}.row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px;margin:7px 0;background:#0b0710;border:1px solid var(--line)}.section{margin-top:28px}.ok{color:#8dffc8}.bad{color:#ff7195}.editor{margin-top:22px;background:#0b0710;border:1px solid #55306f;padding:20px}.editor input,.editor textarea{width:100%;padding:11px;background:#07050a;color:white;border:1px solid #39214d;margin:6px 0 13px}.editor textarea{min-height:130px}.footer{text-align:center;border-top:1px solid var(--line);padding:24px;color:#6e6078}.notice{padding:14px;border-left:3px solid var(--purple);background:#12091b;margin:12px 0}.hidden{display:none}
+</style>
+</head>
+<body>
+<header><div class="logo">VALØR</div><nav id="nav"></nav></header>
+<main id="app"></main>
+<footer class="footer">VALØR • Dark / Neon / Competitive</footer>
+
+<!-- Supabase JS client. One file: no separate JavaScript file is required. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/*
+===========================================================
+VALØR ONE-FILE EDITION
+===========================================================
+1. Create a Supabase project.
+2. Run the SQL shown in README/setup instructions from the
+   previous package.
+3. Replace these TWO values:
+   YOUR_SUPABASE_URL
+   YOUR_SUPABASE_PUBLISHABLE_KEY
+4. Upload only this index.html to GitHub.
+===========================================================
+*/
+const SUPABASE_URL="YOUR_SUPABASE_URL";
+const SUPABASE_KEY="YOUR_SUPABASE_PUBLISHABLE_KEY";
+const configured=!SUPABASE_URL.startsWith("YOUR_")&&!SUPABASE_KEY.startsWith("YOUR_");
+const sb=configured?supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+
+const admins={
+"00VYANE-VALOR-CLAN-RIVALS-QAWSEDRFTGYHUJIKOL":{name:"00Vyane",role:"Web Founder-Creator",level:5},
+"VALOR-DAMJAN-OWNER-7XK9M2Q8":{name:"Damjan",role:"Owner",level:4},
+"VALOR-VALOR-OWNER-4P7N8Z3L":{name:"Valor",role:"Owner",level:4},
+"VALOR-GERRARD-COOWNER-6R2K9V5M":{name:"Gerrard",role:"Co-owner",level:3}
+};
+let currentAdmin=null;
+
+const defaults={
+homepage:{title:"WELCOME TO VALØR",subtitle:"Shared VALØR command network.",winRate:"CONFIGURABLE"},
+war:{active:"NH",opponent:"IGN / TSN",score:"TBD",result:"TBD",status:"ACTIVE"},
+roster:["Ban_danil","6ipzz","Damjan","Bleed","Valor"],
+stats:{members:"220+",tier:"Infinity / T5",wars:"30+",winRate:"CONFIGURABLE"},
+intel:[],media:[],rules:"No official rules published yet.",faq:[],
+developers:["×× ηθ€an","VALOR","VΛLØR_[Бан]Даниил","BLEED ☠️jffr","TURTLE ⚡TFN","GerrardSUSNPC","Specter 🥀 G122 👑","VALOR_ME 💙OwO","VALØR | Vxz","00Vyane"],
+audit:[]
+};
+
+const pages=[["home","HOME"],["war","WAR ROOM"],["tiers","TIER RANKING"],["roster","ROSTER"],["divisions","DIVISIONS"],["rules","RULES"],["faq","FAQ"],["media","MEDIA"],["intel","INTEL"],["devs","DEVS"],["admin","ADMIN"]];
+
+function esc(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function nav(){document.getElementById("nav").innerHTML=pages.map(p=>`<button onclick="go('${p[0]}')">${p[1]}</button>`).join("")}
+function go(p){location.hash=p;render(p)}
+function card(k,v){return `<div class="card"><div class="muted">${esc(k)}</div><div class="value">${esc(v)}</div></div>`}
+function section(e,t,b){return `<div class="eyebrow">${e}</div><h1>${t}</h1>${b}`}
+async function getData(key){
+ if(!configured)return defaults[key];
+ try{const {data,error}=await sb.from("site_data").select("value").eq("key",key).maybeSingle();if(error)throw error;return data?.value??defaults[key]}
+ catch(e){return defaults[key]}
+}
+async function setData(key,value){
+ if(!configured)throw new Error("Connect Supabase first.");
+ const {error}=await sb.from("site_data").upsert({key,value,updated_at:new Date().toISOString()},{onConflict:"key"});
+ if(error)throw error;
+}
+async function audit(action){try{let a=await getData("audit");a.unshift({admin:currentAdmin?.name||"unknown",action,time:new Date().toLocaleString()});await setData("audit",a.slice(0,100))}catch(e){}}
+
+async function render(p){
+ const a=document.getElementById("app");
+ if(p==="admin"){adminPage();return}
+ if(p==="home"){let h=await getData("homepage"),s=await getData("stats");a.innerHTML=`<div class="hero"><div class="eyebrow">COMMAND NETWORK</div><h1>${esc(h.title)}</h1><p class="muted">${esc(h.subtitle)}</p></div><div class="grid">${card("GAME","Roblox")}${card("WEAPON","Knife")}${card("MEMBERS",s.members)}${card("TIER",s.tier)}${card("WAR WINS",s.wars)}${card("WIN RATE",h.winRate)}</div>`;return}
+ if(p==="war"){let w=await getData("war");a.innerHTML=section("LIVE OPERATIONS","WAR ROOM",`<div class="grid">${card("ACTIVE WAR",w.active)}${card("OPPONENT",w.opponent)}${card("SCORE",w.score)}${card("RESULT",w.result)}${card("STATUS",w.status)}</div>`);return}
+ if(p==="tiers"){let s=await getData("stats");a.innerHTML=section("COMPETITIVE","TIER RANKING",`<div class="grid">${card("TIER",s.tier)}${card("RANKING","Infinity → T5")}${card("WAR WINS",s.wars)}</div>`);return}
+ if(p==="roster"){let x=await getData("roster");a.innerHTML=section("PERSONNEL","ROSTER",x.map(v=>`<div class="row">${esc(v)}</div>`).join(""));return}
+ if(p==="divisions"){a.innerHTML=section("COMBAT","DIVISIONS",`<div class="notice">Official division names, captains and statistics have not been provided, so nothing has been invented here.</div>`);return}
+ if(p==="rules"){let x=await getData("rules");a.innerHTML=section("CODEX","RULES & CODEX",`<div class="card">${esc(x).replace(/\n/g,"<br>")}</div>`);return}
+ if(p==="faq"){let x=await getData("faq");a.innerHTML=section("KNOWLEDGE","FAQ",x.map(v=>`<div class="card"><b>${esc(v.q)}</b><p class="muted">${esc(v.a)}</p></div>`).join("")||'<p class="muted">No FAQ entries yet.</p>');return}
+ if(p==="media"){let x=await getData("media");a.innerHTML=section("CLAN MEDIA","MEDIA VAULT",x.map(v=>`<div class="row">${esc(v)}</div>`).join("")||'<p class="muted">No media entries yet.</p>');return}
+ if(p==="intel"){let x=await getData("intel");a.innerHTML=section("INTELLIGENCE","INTEL FEED",x.map(v=>`<div class="row">${esc(v)}</div>`).join("")||'<p class="muted">No intel yet.</p>');return}
+ if(p==="devs"){let x=await getData("developers");a.innerHTML=section("BUILD TEAM","DEVELOPERS",x.map((v,i)=>`<div class="row"><span>${i+1}. ${esc(v)}</span></div>`).join(""));return}
+}
+
+function adminPage(){
+document.getElementById("app").innerHTML=`<div class="eyebrow">RESTRICTED COMMAND</div><h1>ADMIN HUB</h1>
+<div class="card"><p class="muted">Only the four configured administrators can enter. Shared editing requires Supabase.</p>
+<input id="pk" type="password" placeholder="Admin passkey">
+<button class="btn" onclick="login()">AUTHENTICATE</button><div id="loginmsg"></div>
+</div><div id="adminpanel"></div>`;
+}
+function login(){
+const k=document.getElementById("pk").value.trim(),x=admins[k];
+if(!x){document.getElementById("loginmsg").innerHTML='<p class="bad">ACCESS DENIED</p>';return}
+currentAdmin=x;
+document.getElementById("loginmsg").innerHTML=`<p class="ok">ACCESS GRANTED<br>WELCOME, ${esc(x.name)}<br>${esc(x.role)} • COMMAND LEVEL ${x.level}</p>`;
+showPanel();
+}
+function showPanel(){
+const tools=[["Homepage",3,"homepage"],["War Management",3,"war"],["Roster",3,"roster"],["Stats",3,"stats"],["Announcements",1,"announcements"],["Intel",3,"intel"],["Rules",3,"rules"],["FAQ",3,"faq"],["Media",3,"media"],["Developers",4,"developers"],["Site Appearance",5,"appearance"],["Audit Log",3,"audit"]];
+document.getElementById("adminpanel").innerHTML=`<div class="grid section">${tools.map(t=>`<div class="card"><h3>${t[0]}</h3><span class="${currentAdmin.level>=t[1]?"ok":"bad"}">${currentAdmin.level>=t[1]?"ACCESS":"LOCKED"} · LVL ${t[1]}</span><br><button class="btn" ${currentAdmin.level>=t[1]?"":"disabled"} onclick="editor('${t[2]}')">EDIT</button></div>`).join("")}</div><div id="editor" class="editor"></div>`;
+}
+async function editor(type){
+const e=document.getElementById("editor"),x=await getData(type);
+if(type==="homepage")e.innerHTML=`<h2>Homepage</h2><label>Title</label><input id="a1" value="${esc(x.title)}"><label>Subtitle</label><textarea id="a2">${esc(x.subtitle)}</textarea><label>Win rate</label><input id="a3" value="${esc(x.winRate)}"><button class="btn" onclick="saveHome()">SAVE GLOBALLY</button>`;
+else if(type==="war")e.innerHTML=`<h2>War</h2>${["active","opponent","score","result","status"].map((k,i)=>`<label>${k}</label><input id="w${i}" value="${esc(x[k])}">`).join("")}<button class="btn" onclick="saveWar()">SAVE GLOBALLY</button>`;
+else if(type==="stats")e.innerHTML=`<h2>Stats</h2><label>Members</label><input id="s1" value="${esc(x.members)}"><label>Tier</label><input id="s2" value="${esc(x.tier)}"><label>War wins</label><input id="s3" value="${esc(x.wars)}"><label>Win rate</label><input id="s4" value="${esc(x.winRate)}"><button class="btn" onclick="saveStats()">SAVE GLOBALLY</button>`;
+else if(["roster","developers","intel","media"].includes(type))e.innerHTML=`<h2>${type}</h2><label>One entry per line</label><textarea id="list">${esc((x||[]).join("\n"))}</textarea><button class="btn" onclick="saveList('${type}')">SAVE GLOBALLY</button>`;
+else if(type==="rules")e.innerHTML=`<h2>Rules</h2><textarea id="rules">${esc(x)}</textarea><button class="btn" onclick="saveRules()">SAVE GLOBALLY</button>`;
+else if(type==="faq"||type==="announcements")e.innerHTML=`<h2>${type}</h2><label>JSON content</label><textarea id="json">${esc(JSON.stringify(x,null,2))}</textarea><button class="btn" onclick="saveJSON('${type}')">SAVE GLOBALLY</button>`;
+else if(type==="appearance")e.innerHTML=`<h2>Appearance</h2><label>Primary purple</label><input id="c1" value="#9b4dff"><label>Neon violet</label><input id="c2" value="#c46cff"><button class="btn" onclick="saveAppearance()">SAVE GLOBALLY</button>`;
+else if(type==="audit")e.innerHTML=`<h2>Audit Log</h2>${(x||[]).map(v=>`<div class="row">${esc(v.admin)} — ${esc(v.action)} — ${esc(v.time)}</div>`).join("")||"No entries."}`;
+e.scrollIntoView({behavior:"smooth"});
+}
+function v(id){return document.getElementById(id)?.value||""}
+async function saveHome(){try{await setData("homepage",{title:v("a1"),subtitle:v("a2"),winRate:v("a3")});await audit("Updated homepage");alert("Saved for everyone.");render("home")}catch(e){alert(e.message)}}
+async function saveWar(){try{await setData("war",{active:v("w0"),opponent:v("w1"),score:v("w2"),result:v("w3"),status:v("w4")});await audit("Updated war");alert("Saved for everyone.")}catch(e){alert(e.message)}}
+async function saveStats(){try{await setData("stats",{members:v("s1"),tier:v("s2"),wars:v("s3"),winRate:v("s4")});await audit("Updated stats");alert("Saved for everyone.");render("home")}catch(e){alert(e.message)}}
+async function saveList(t){try{await setData(t,v("list").split(/\n/).map(x=>x.trim()).filter(Boolean));await audit("Updated "+t);alert("Saved for everyone.")}catch(e){alert(e.message)}}
+async function saveRules(){try{await setData("rules",v("rules"));await audit("Updated rules");alert("Saved for everyone.");render("rules")}catch(e){alert(e.message)}}
+async function saveJSON(t){try{await setData(t,JSON.parse(v("json")));await audit("Updated "+t);alert("Saved for everyone.")}catch(e){alert("Invalid JSON or database not connected.")}}
+async function saveAppearance(){try{await setData("appearance",{purple:v("c1"),violet:v("c2")});await audit("Updated appearance");document.documentElement.style.setProperty("--purple",v("c1"));document.documentElement.style.setProperty("--violet",v("c2"));alert("Saved for everyone.")}catch(e){alert(e.message)}}
+
+nav();render(location.hash.slice(1)||"home");
+</script>
+
+<script>
+/* ===== VALØR FINAL OWNER ACTIVITY MONITOR ===== */
+const valorOriginalShowPanel = showPanel;
+showPanel = function(){
+  valorOriginalShowPanel();
+  if(window.currentAdmin && window.currentAdmin.level===5){
+    const panel=document.getElementById("adminpanel");
+    if(panel){
+      panel.insertAdjacentHTML("afterbegin",`
+        <div class="card section" id="ownerActivity">
+          <h2>🔔 LIVE ADMIN ACTIVITY</h2>
+          <p class="muted">Owner-only monitor. Shows shared admin actions recorded in the database.</p>
+          <div id="activityList"><span class="muted">Loading...</span></div>
+          <button class="btn" onclick="loadOwnerActivity()">REFRESH</button>
+        </div>`);
+      loadOwnerActivity();
+      if(window.valorActivityTimer) clearInterval(window.valorActivityTimer);
+      window.valorActivityTimer=setInterval(loadOwnerActivity,10000);
+    }
+  }
+};
+async function loadOwnerActivity(){
+  const box=document.getElementById("activityList"); if(!box)return;
+  try{
+    const logs=await getData("audit");
+    box.innerHTML=logs?.length ? logs.slice(0,30).map(x=>`
+      <div class="row"><span><b>${esc(x.admin||"Unknown")}</b><br><span class="muted">${esc(x.action||"Action")}</span></span><span class="muted">${esc(x.time||"")}</span></div>`).join("")
+      : '<p class="muted">No admin activity yet.</p>';
+  }catch(e){box.innerHTML='<p class="bad">Shared activity unavailable until Supabase is connected.</p>'}
+}
+</script>
+
+</body>
+</html>
